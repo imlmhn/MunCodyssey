@@ -34,7 +34,7 @@ try:
     formatted_data = format_markdown(data)
 
     # 결과를 "mission_log.md" 파일로 저장
-    with open("mission_log.md", 'w', encoding='utf-8') as md_file:
+    with open("week1/mission_log.md", 'w', encoding='utf-8') as md_file:
         md_file.write(formatted_data)
 
     print("Markdown 파일이 성공적으로 저장되었습니다.\n")
