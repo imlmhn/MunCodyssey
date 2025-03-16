@@ -1,4 +1,4 @@
-log_file = "mission_computer_main.log"
+log_file = "week1/mission_computer_main.log"
 
 try:
     file = open(log_file, "r", encoding="utf-8")
