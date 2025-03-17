@@ -16,7 +16,7 @@ try:
     
     for line in readFile:
         log_lines.append(line.strip())
-        if "Oxygen" in line or "oxygen" in line:
+        if "oxygen" in line.lower(): 
             # timestamp, event, message로 분리
             parts = line.strip().split(",")
             timestamp = parts[0]
