@@ -2,8 +2,8 @@ log_file = "week1/mission_computer_main.log"
 result_file = "week1/log_analysis.md"
 
 try:
-    result_lines = []  # 오류 로그를 저장하는 리스트트
-    log_lines = []
+    result_lines = []  # 오류 로그를 저장하는 리스트
+    log_lines = [] # 기존 로그를 저장하는 리스트
     
     result_lines.append("# 로그 분석 보고서\n\n")
     result_lines.append("## 사고 개요\n")
@@ -25,23 +25,25 @@ try:
 
             # 마크다운 형식으로 변환하여 리스트에 추가
             result_lines.append(f"### {timestamp}\n**Event:** {event}\n**Message:** {message}\n")
-            
-    # 리스트에 저장된 내용이 있을 경우 한 번에 파일에 쓰기
+    
+    readFile.close()
+    
     if result_lines:
         with open(result_file, "w", encoding="utf-8") as writeFile:
             writeFile.writelines(result_lines)  # 한 번에 저장
 
-
-    # log_lines를 거꾸로 정렬 (내림차순으로)
+    # log_lines를 그대로 출력 (오름차순으로)
+    for row in log_lines:
+        print(row) 
+        
+    # log_lines를 거꾸로 출력 (내림차순으로)
     reversed_lines = list(reversed(log_lines))
-
-    # 거꾸로 된 데이터 출력
     for row in reversed_lines:
-        print(row)  # 원본 데이터를 거꾸로 출력
+        print(row)
     
     print(f"로그 분석이 완료되었습니다. 결과 파일: {result_file}")
     
-    readFile.close()
+    
     
 except FileNotFoundError:
     print(f"파일을 찾을 수 없습니다: {log_file}")
