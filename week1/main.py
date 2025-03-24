@@ -1,49 +1,50 @@
-import csv
-
-def read_csv(file_path):
-    with open(file_path, mode='r', encoding='utf-8') as file:
-        reader = csv.DictReader(file)
-        data = list(reader)
-    return data
-
-def sort_by_flammability(data):
-    return sorted(data, key=lambda x: float(x['Flammability']), reverse=True)
-
-def filter_high_flammability(data, threshold=0.7):
-    return [item for item in data if float(item['Flammability']) >= threshold]
-
-def write_csv(file_path, data):
-    with open(file_path, mode='w', newline='', encoding='utf-8') as file:
-        fieldnames = data[0].keys()
-        writer = csv.DictWriter(file, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(data)
-
-def main():
-    input_file = 'week2/Mars_Base_Inventory_List.csv'
-    output_file = 'week2/Mars_Base_Inventory_danger.csv'
+log_file = "week1/mission_computer_main.log"
+result_file = "week1/log_analysis.md"
+ 
+try:
     
-    # Hello Mars 출력
     print("Hello Mars")
     
-    # CSV 파일 읽기
-    inventory_data = read_csv(input_file)
-    
-    # 인화성 기준으로 정렬
-    sorted_inventory = sort_by_flammability(inventory_data)
-    print("정렬된 적재 화물 목록:")
-    for item in sorted_inventory:
-        print(item)
-    
-    # 인화성 지수가 0.7 이상인 목록 필터링
-    dangerous_items = filter_high_flammability(sorted_inventory, 0.7)
-    print("\n인화성 지수가 0.7 이상인 목록:")
-    for item in dangerous_items:
-        print(item)
-    
-    # CSV 파일로 저장
-    write_csv(output_file, dangerous_items)
-    print(f"\n인화성 지수가 0.7 이상인 목록이 {output_file} 파일로 저장되었습니다.")
+    result_lines = []  # 오류 로그를 저장하는 리스트
+    log_lines = [] # 기존 로그를 저장하는 리스트
 
-if __name__ == "__main__":
-    main()
+    result_lines.append("# 로그 분석 보고서\n\n")
+    result_lines.append("## 사고 개요\n")
+    result_lines.append("- **발생 일시:** 2023-08-27 11:35:00 ~ 11:40:00\n")
+    result_lines.append("- **이벤트:** 산소 탱크 불안정 → 산소 탱크 폭발\n")
+    result_lines.append("- **결과:** 로켓 회수 후 폭발 발생, 센터 및 미션 컨트롤 시스템 종료됨\n\n")
+    result_lines.append("## 로그 분석\n\n")
+
+    readFile = open(log_file, "r", encoding="utf-8")
+
+    for line in readFile:
+        log_lines.append(line.strip())
+        if "oxygen" in line.lower(): 
+            # timestamp, event, message로 분리
+            parts = line.strip().split(",")
+            timestamp = parts[0]
+            event = parts[1]
+            message = parts[2]
+
+            # 마크다운 형식으로 변환하여 리스트에 추가
+            result_lines.append(f"### {timestamp}\n**Event:** {event}\n**Message:** {message}\n")
+
+    readFile.close()
+
+    if result_lines:
+        with open(result_file, "w", encoding="utf-8") as writeFile:
+            writeFile.writelines(result_lines)  # 한 번에 저장
+
+    # log_lines를 그대로 출력 (오름차순으로)
+    for row in log_lines:
+        print(row) 
+
+    # log_lines를 거꾸로 출력 (내림차순으로)
+    reversed_lines = list(reversed(log_lines))
+    for row in reversed_lines:
+        print(row)
+    print(f"로그 분석이 완료되었습니다. 결과 파일: {result_file}")
+except FileNotFoundError:
+    print(f"파일을 찾을 수 없습니다: {log_file}")
+except Exception as e:
+    print(f"파일을 읽는 중 오류가 발생했습니다: {e}")
