@@ -23,6 +23,9 @@ def main():
     input_file = 'week2/Mars_Base_Inventory_List.csv'
     output_file = 'week2/Mars_Base_Inventory_danger.csv'
     
+    # Hello Mars 출력
+    print("Hello Mars")
+    
     # CSV 파일 읽기
     inventory_data = read_csv(input_file)
     
