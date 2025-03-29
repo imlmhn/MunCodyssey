@@ -60,7 +60,7 @@ class DummySensor:
         self.env_values["mars_base_internal_oxygen"] = get_random_with_step(4, 7)
             
     def get_env(self): 
-        log_file = "week3/mission_computer_main.log"
+        log_file = "week3/mission_computer_main.md"
                 # 현재 날짜와 시간 가져오기
         current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
@@ -75,10 +75,10 @@ class DummySensor:
         }
         
         # 마크다운 형식으로 기록할 내용 생성
-        log_content = f"# {current_time}\n"
+        log_content = f"현재 날짜 : {current_time}\n\n"
         for key, value in self.env_values.items():
             korean_key = env_in_korean.get(key, key)  # 키를 한글로 변환
-            log_content += f"- **{korean_key}**: {value}\n"
+            log_content += f"{korean_key} : {value}\n"
         
         # 로그 파일에 기록
         with open(log_file, "a", encoding="utf-8") as f:
