@@ -24,14 +24,7 @@ def write_csv(file_path, data):
 def write_binary(file_path, data):
     with open(file_path, mode='wb') as file:
         for item in data:
-            line = ''
-            for h in item.keys():
-                value = item[h]
-                if isinstance(value, float):  # 실수형 데이터인 경우
-                    line += float(value) + ','  # 실수형 데이터 그대로 추가
-                else:
-                    line += str(value) + ','  # 문자 데이터도 문자열로 변환하여 추가
-            line = line.rstrip(',') + '\n'  # 마지막 ',' 제거하고 줄바꿈 추가
+            line = ','.join(str(item[h]) for h in item.keys()) + '\n'
             file.write(line.encode('utf-8'))
 
 def read_binary(file_path):

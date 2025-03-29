@@ -2,7 +2,6 @@ log_file = "week1/mission_computer_main.log"
 result_file = "week1/log_analysis.md"
  
 try:
-    
     print("Hello Mars")
     
     result_lines = []  # 오류 로그를 저장하는 리스트
