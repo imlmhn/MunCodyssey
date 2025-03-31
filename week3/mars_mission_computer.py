@@ -12,6 +12,7 @@ def is_float(value):
     return False  # 실수가 아니거나 소수점 이하 자릿수가 없는 경우
 
 def get_random_with_step(start, end, step=1):
+    
     # start가 end보다 크거나, step이 1이 아니면서 end를 초과하면 error 반환
     if((start > end) or (step!=1 and end<step)):
         return "Error"
@@ -60,8 +61,9 @@ class DummySensor:
         self.env_values["mars_base_internal_oxygen"] = get_random_with_step(4, 7)
             
     def get_env(self): 
-        log_file = "week3/mission_computer_main.md"
-                # 현재 날짜와 시간 가져오기
+        log_file = "week3/mission_computer_main"
+        
+        # 현재 날짜와 시간 가져오기
         current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         # 한글화된 환경 변수
