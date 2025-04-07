@@ -53,7 +53,7 @@ class DummySensor:
             
     def set_env(self):
         # 3번째 step 인자를 주지 않으면, start의 자리수에 맞게 1단위로 step 설정
-        self.env_values["mars_base_internal_temperature"] = get_random_with_step(18, 30, 19)
+        self.env_values["mars_base_internal_temperature"] = get_random_with_step(18, 30)
         self.env_values["mars_base_external_temperature"] = get_random_with_step(0, 21)
         self.env_values["mars_base_internal_humidity"] = get_random_with_step(50, 60)
         self.env_values["mars_base_external_illuminance"] = get_random_with_step(500, 715)
@@ -98,7 +98,6 @@ ds.set_env()
 # env_values 받아와 변수에 저장
 result = ds.get_env()
 
-# 딕셔너리 형태로 출력
-for key, value in result.items():
-    print(f"{key} : {value}")
-
+# # 딕셔너리 형태로 출력
+# for key, value in result.items():
+#     print(f"{key} : {value}")
