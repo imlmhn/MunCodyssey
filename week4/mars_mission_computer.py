@@ -3,7 +3,8 @@ import time
 import threading
 import json
 
-# 평균 계산 간격(*5초)
+# 평균 계산 간격 변수(*5초)
+# 5분 60(300초) 설정
 # 임의로 3(15초) 설정
 AVERAGE_INTERVAL = 3
 
@@ -47,19 +48,30 @@ class MissionComputer:
         # 시간 저장 변수. 1 -> 5초
         count = 0
         while self.running:
+            # 인스턴스에 값 할당
             ds.set_env()
+            
+            # 할당한 값을 그대로 받아옴
             self.env_values = ds.env_values
+            
+            # 받아온 값 출력
             self.print_env_values()
+            
+            # 받아온 값을 저장 변수에 저장
             for key in self.env_values:
                 self.data_history[key].append(self.env_values[key])
                 if len(self.data_history[key]) > AVERAGE_INTERVAL: 
                     self.data_history[key].pop(0)
 
-            time.sleep(5)
-            
+            # AVERAGE_INTERVAL 간격마다 평균값 출력
             count += 1
             if count % AVERAGE_INTERVAL == 0:
                 self.compute_5min_average()
+                
+            # 5초 휴식
+            time.sleep(5)
+            
+
             
     # 종료 함수
     def stop(self):
@@ -86,6 +98,6 @@ thread_listener = threading.Thread(target=listen_for_stop, args=(RunComputer,))
 thread_sensor.start()
 thread_listener.start()
 
-# 두 스레드가 종료할 때까지 메인 프로그램 기다리게 함함 
+# 두 스레드가 종료할 때까지 메인 프로그램 기다리게 함
 thread_sensor.join()
 thread_listener.join()
