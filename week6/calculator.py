@@ -86,10 +86,8 @@ class Calculator(QWidget):
                     """)
                     
                 if btn_text == '0':
-                    # btn = QPushButton(btn_text)
-                    # btn.setFixedHeight(80)
-                    # btn.setFixedWidth(150)
-                    self.buttonLayout.addWidget(btn, row + 1, col)
+                    btn.setFixedWidth(210)  # 두 칸 넓이
+                    self.buttonLayout.addWidget(btn, row + 1, col - 1, 1, 2)  # col - 1 위치에서 시작, 2칸 차지
                 elif btn_text == '=' and len(row_values) == 3:
                     # btn = QPushButton(btn_text)
                     # btn.setFixedHeight(80)
@@ -129,7 +127,13 @@ class Calculator(QWidget):
             except:
                 self.expression = "Error"
         else:
+            if text.isdigit() or text == '.':
+            # 숫자만 세기 (소수점 제외)
+                digit_count = len([c for c in self.expression if c.isdigit()])
+            if digit_count >= 8:
+                return  # 입력 막기
             self.expression += text
+
 
         self.display.setText(self.expression)
 
