@@ -1,6 +1,5 @@
 import sys
-import ast
-import operator
+import re
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QGridLayout, QPushButton, QLineEdit
 )
@@ -15,8 +14,9 @@ class Calculator(QWidget):
         self.initUI()
 
     def initUI(self):
-        self.layout = QVBoxLayout() # 위에서부터 수직으로 요소를 붙이는 레이아웃
+        self.layout = QVBoxLayout()
         self.layout.setSpacing(0)
+
         self.display = QLineEdit("0")
         self.display.setReadOnly(True)
         self.display.setAlignment(Qt.AlignRight)
@@ -99,8 +99,15 @@ class Calculator(QWidget):
         self.expression = ""
         self.reset_next_input = False
 
+    def add(self, a, b): return a + b
+    def subtract(self, a, b): return a - b
+    def multiply(self, a, b): return a * b
+    def divide(self, a, b): return a / b if b != 0 else "Error"
+
     def format_number(self, num_str):
         try:
+            if num_str.endswith('.'):
+                return num_str
             if '.' in num_str:
                 num = float(num_str)
                 return f"{num:,.10g}"
@@ -110,36 +117,61 @@ class Calculator(QWidget):
         except:
             return num_str
 
+
+    def adjust_font_size(self, text):
+        length = len(text)
+        if length <= 8:
+            size = 80
+        elif length <= 12:
+            size = 60
+        elif length <= 18:
+            size = 40
+        else:
+            size = 30
+
+        self.display.setStyleSheet(f"""
+            QLineEdit {{
+                color : white;
+                font-size : {size}px;
+                border : none;
+            }}                           
+        """)
+
     def safe_eval(self, expr):
         try:
+            # 1. '×'를 '*'로, '÷'를 '/'로 변환하여 Python 연산자가 사용될 수 있도록 수정
             expr = expr.replace('×', '*').replace('÷', '/')
-            tree = ast.parse(expr, mode='eval')
 
-            def _eval(node):
-                if isinstance(node, ast.Expression):
-                    return _eval(node.body)
-                elif isinstance(node, ast.BinOp):
-                    left = _eval(node.left)
-                    right = _eval(node.right)
-                    ops = {
-                        ast.Add: operator.add,
-                        ast.Sub: operator.sub,
-                        ast.Mult: operator.mul,
-                        ast.Div: operator.truediv,
-                    }
-                    return ops[type(node.op)](left, right)
-                elif isinstance(node, ast.UnaryOp):
-                    if isinstance(node.op, ast.USub):
-                        return -_eval(node.operand)
-                elif isinstance(node, ast.Num):
-                    return node.n
-                elif isinstance(node, ast.Constant):
-                    return node.value
-                else:
-                    raise TypeError("Unsupported type")
-            return str(_eval(tree))
+            # 2. *와 / 연산자부터 먼저 처리 (우선순위)
+            while re.search(r'\d+(\.\d+)?\s*[\*/]\s*-?\d+(\.\d+)?', expr):
+                expr = re.sub(r'(\d+(\.\d+)?)\s*([\*/])\s*(-?\d+(\.\d+)?)', self._compute_mul_div, expr, count=1)
+
+            # 3. +와 - 연산자 처리
+            while re.search(r'-?\d+(\.\d+)?\s*[\+-]\s*-?\d+(\.\d+)?', expr):
+                expr = re.sub(r'(-?\d+(\.\d+)?)\s*([\+-])\s*(-?\d+(\.\d+)?)', self._compute_add_sub, expr, count=1)
+
+            result = float(expr)  # 문자열을 실수로 변환
+            result = round(result, 6)  # 6자리 반올림
+
+            return str(result) 
+        
         except:
             return "Error"
+
+    def _compute_mul_div(self, match):
+        a, op, b = float(match.group(1)), match.group(3), float(match.group(4))
+        if op == '*':
+            return str(self.multiply(a, b))
+        elif op == '/':
+            result = self.divide(a, b)
+            return str(result) if result != "Error" else "Error"
+
+    def _compute_add_sub(self, match):
+        a, op, b = float(match.group(1)), match.group(3), float(match.group(4))
+        if op == '+':
+            return str(self.add(a, b))
+        elif op == '-':
+            return str(self.subtract(a, b))
 
     def onButtonClick(self):
         button = self.sender()
@@ -153,11 +185,13 @@ class Calculator(QWidget):
                 self.expression += text
 
         elif text == '.':
-            if self.reset_next_input:
-                self.expression = '0.'
+            if self.reset_next_input or self.expression == "":
+                self.expression = "0."
                 self.reset_next_input = False
-            elif '.' not in self.expression.split()[-1]:
-                self.expression += '.'
+            else:
+                tokens = re.split(r'[+\-×÷]', self.expression)
+                if '.' not in tokens[-1]:
+                    self.expression += '.'
 
         elif text in '+-×÷':
             if self.expression and self.expression[-1] not in '+-×÷':
@@ -170,10 +204,10 @@ class Calculator(QWidget):
                 self.expression = result
                 self.reset_next_input = True
             else:
-                self.expression = result
+                self.expression = "Error"
 
         elif text == 'AC':
-            self.expression = ""
+            self.expression = '0'
             self.reset_next_input = False
 
         elif text == '+/-':
@@ -193,14 +227,18 @@ class Calculator(QWidget):
             except:
                 self.expression = "Error"
 
-        # 표시 형식 적용
+        # 결과 표시 및 폰트 크기 조절
         if self.expression not in ['Error', '']:
             if self.expression[-1] in '+-×÷':
                 self.display.setText(self.expression)
+                self.adjust_font_size(self.expression)
             else:
-                self.display.setText(self.format_number(self.expression))
+                formatted = self.format_number(self.expression)
+                self.display.setText(formatted)
+                self.adjust_font_size(formatted)
         else:
             self.display.setText(self.expression)
+            self.adjust_font_size(self.expression)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
