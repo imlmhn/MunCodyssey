@@ -1,5 +1,6 @@
 import sys
 import re
+
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QGridLayout, QPushButton, QLineEdit
 )
