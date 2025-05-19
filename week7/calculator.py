@@ -97,13 +97,10 @@ class Calculator(QWidget):
 
         self.layout.addLayout(self.buttonLayout)
         self.setLayout(self.layout)
+        
+        
         self.expression = ""
         self.reset_next_input = False
-
-    def add(self, a, b): return a + b
-    def subtract(self, a, b): return a - b
-    def multiply(self, a, b): return a * b
-    def divide(self, a, b): return a / b if b != 0 else "Error"
 
     def format_number(self, num_str):
         try:
@@ -159,6 +156,11 @@ class Calculator(QWidget):
         except:
             return "Error"
 
+    def add(self, a, b): return a + b
+    def subtract(self, a, b): return a - b
+    def multiply(self, a, b): return a * b
+    def divide(self, a, b): return a / b if b != 0 else "Error"
+    
     def _compute_mul_div(self, match):
         a, op, b = float(match.group(1)), match.group(3), float(match.group(4))
         if op == '*':
