@@ -169,3 +169,15 @@ def unlock_zip(zip_path='week8/emergency_storage_key.zip', output_file='password
 
 if __name__ == '__main__':
         unlock_zip()
+        
+        
+        # 해결방법
+        # MEMORY에 올려서 작업할 것. 
+        # 파일 압축 해제 하지 말 것. EXTRACT 제거. 
+        # FOR문으로 돌려서 하면 더 빠름. 
+        # POOL()을 사용해서 최대 CPU 코어를 사용해 멀티프로세스 동자 구현.
+        # 6자리 중 첫 번째 자리로 멀티 스레드를 각각 동작시킴. 나머지 5자리에 대해 FOR문 돌려서 찾기
+        
+        
+        
+        
