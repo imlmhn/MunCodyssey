@@ -1,6 +1,9 @@
+# pip install mysql-connector-python matplotlib
 import csv
 import mysql.connector
 from datetime import datetime
+import os
+import matplotlib.pyplot as plt
 
 class MySQLHelper:
     """MySQL 데이터베이스 연결 및 쿼리를 관리하는 헬퍼 클래스."""
@@ -51,11 +54,8 @@ def read_csv_file(file_path):
         with open(file_path, 'r', encoding='utf-8') as file:
             reader = csv.DictReader(file)
             for row in reader:
-                # mars_date를 datetime 객체로 변환 (YYYY-MM-DD)
                 row['mars_date'] = datetime.strptime(row['mars_date'], '%Y-%m-%d')
-                # temp를 부동소수점으로 변환
                 row['temp'] = float(row['temp'])
-                # storm을 정수로 변환 (CSV 헤더는 'stom')
                 row['storm'] = int(row['stom'])
                 data.append(row)
         return data
@@ -80,18 +80,56 @@ def insert_weather_data(db_helper, data):
         except mysql.connector.Error as e:
             print(f'데이터 삽입 오류: {e}')
 
+def plot_weather_data(data, output_path):
+    """온도와 폭풍 데이터를 시각화하고 PNG로 저장."""
+    if not data:
+        print('시각화할 데이터가 없습니다.')
+        return
+    
+    # week12 폴더 생성
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    
+    dates = [row['mars_date'] for row in data]
+    temps = [row['temp'] for row in data]
+    storms = [row['storm'] for row in data]
+    
+    fig, ax1 = plt.subplots(figsize=(12, 6))
+    
+    # 온도 그래프 (왼쪽 y축)
+    ax1.plot(dates, temps, 'b-', label='Temperature (°C)')
+    ax1.set_xlabel('Mars Date')
+    ax1.set_ylabel('Temperature (°C)', color='b')
+    ax1.tick_params(axis='y', labelcolor='b')
+    
+    # 폭풍 그래프 (오른쪽 y축)
+    ax2 = ax1.twinx()
+    ax2.plot(dates, storms, 'r-', label='Storm Intensity')
+    ax2.set_ylabel('Storm Intensity', color='r')
+    ax2.tick_params(axis='y', labelcolor='r')
+    
+    # 제목 및 범례
+    plt.title('Mars Weather: Temperature and Storm Intensity (2050-2052)')
+    fig.legend(loc='upper right', bbox_to_anchor=(0.95, 0.95))
+    
+    # 레이아웃 조정 및 저장
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=300)
+    plt.close()
+    print(f'그래프 저장 완료: {output_path}')
+
 def main():
     """프로그램의 메인 함수."""
     # MySQL 연결 설정 (사용자 환경에 맞게 수정)
     db_config = {
         'host': 'localhost',
         'user': 'root',
-        'password': '12345678',
+        'password': '12345678',  # 실제 비밀번호로 변경
         'database': 'mars_mission'
     }
     
-    # CSV 파일 경로
+    # 파일 경로
     csv_file_path = 'week12/mars_weathers_data.csv'
+    plot_output_path = 'week12/mars_weather_plot.png'
     
     try:
         # MySQLHelper 인스턴스 생성
@@ -117,6 +155,9 @@ def main():
         results = db_helper.fetch_query(select_query)
         for row in results:
             print(f'ID: {row[0]}, 날짜: {row[1]}, 온도: {row[2]}, 폭풍: {row[3]}')
+        
+        # 데이터 시각화 및 PNG 저장
+        plot_weather_data(weather_data, plot_output_path)
         
     except mysql.connector.Error as e:
         print(f'MySQL 연결 오류: {e}')
