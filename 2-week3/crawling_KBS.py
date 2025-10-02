@@ -30,7 +30,7 @@ def get_kbs_headlines():
         headline_elements = soup.select(selector)
 
         if not headline_elements:
-            print("오류: 헤드라인 요소를 찾지 못했습니다. 웹사이트 구조가 변경되었을 수 있습니다.")
+            print("오류: 헤드라인 요소를 찾지 못했습니다.")
             return []
 
         for element in headline_elements:
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     kbs_news_headlines = get_kbs_headlines()
 
     if kbs_news_headlines:
-        print('--- KBS 헤드라인 뉴스 (최종 완성본) ---')
+        print('--- KBS 헤드라인 뉴스 ---')
         for index, headline in enumerate(kbs_news_headlines, 1):
             print(f'{index}. {headline}')
     else:
